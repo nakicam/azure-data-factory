@@ -1,0 +1,54 @@
+{
+	"name": "BLOB_dvs_geography_incr_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_LS",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DataVaultTesting"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "adventureworksdv"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "GeographyAlternateKey",
+				"type": "String"
+			},
+			{
+				"name": "City",
+				"type": "String"
+			},
+			{
+				"name": "StateProvinceCode",
+				"type": "String"
+			},
+			{
+				"name": "StateProvinceName",
+				"type": "String"
+			},
+			{
+				"name": "CountryRegionCode",
+				"type": "String"
+			},
+			{
+				"name": "EnglishCountryRegionName",
+				"type": "String"
+			},
+			{
+				"name": "PostalCode",
+				"type": "String"
+			}
+		]
+	}
+}
