@@ -418,9 +418,7 @@
 												"PipelineName": "@{pipeline().Pipeline}",
 												"ErrorMessage": "@variables('var_activity_error_message')",
 												"EmailTo": "@pipeline().parameters.var_email_address"
-											},
-											"linkedServices": [],
-											"datasets": []
+											}
 										}
 									},
 									{
@@ -503,7 +501,7 @@
 			}
 		},
 		"folder": {
-			"name": "Sample Pipelines"
+			"name": "Pipelines"
 		},
 		"annotations": []
 	},

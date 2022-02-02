@@ -25,7 +25,12 @@
 					"dataflow": {
 						"referenceName": "DataVault_Product",
 						"type": "DataFlowReference"
-					}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
 				}
 			},
 			{
@@ -51,7 +56,12 @@
 					"dataflow": {
 						"referenceName": "DataVault_InternetSales",
 						"type": "DataFlowReference"
-					}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
 				}
 			},
 			{
@@ -77,7 +87,12 @@
 					"dataflow": {
 						"referenceName": "DataVault_Geography",
 						"type": "DataFlowReference"
-					}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
 				}
 			},
 			{
@@ -96,12 +111,17 @@
 					"dataflow": {
 						"referenceName": "DataVault_Customer",
 						"type": "DataFlowReference"
-					}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
 				}
 			}
 		],
 		"folder": {
-			"name": "DataVaultTesting"
+			"name": "DataVault"
 		},
 		"annotations": []
 	}

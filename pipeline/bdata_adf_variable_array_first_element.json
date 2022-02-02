@@ -5,6 +5,8 @@
 			{
 				"name": "Set FileList",
 				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
 				"typeProperties": {
 					"variableName": "FileList",
 					"value": {
@@ -24,6 +26,7 @@
 						]
 					}
 				],
+				"userProperties": [],
 				"typeProperties": {
 					"expression": {
 						"value": "@equals(variables('FirstArrayElement'),'Folder')",
@@ -33,6 +36,8 @@
 						{
 							"name": "Wait Files 2 sec",
 							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
 							"typeProperties": {
 								"waitTimeInSeconds": 1
 							}
@@ -42,6 +47,8 @@
 						{
 							"name": "Wait Folder 1 sec",
 							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
 							"typeProperties": {
 								"waitTimeInSeconds": 1
 							}
@@ -60,6 +67,7 @@
 						]
 					}
 				],
+				"userProperties": [],
 				"typeProperties": {
 					"variableName": "FirstArrayElement",
 					"value": {
@@ -78,7 +86,8 @@
 			}
 		},
 		"folder": {
-			"name": "Sample Pipelines"
-		}
+			"name": "Pipelines"
+		},
+		"annotations": []
 	}
 }

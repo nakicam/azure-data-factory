@@ -5,6 +5,8 @@
 			{
 				"name": "Get FeedType",
 				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
 				"typeProperties": {
 					"variableName": "FeedType",
 					"value": {
@@ -24,6 +26,7 @@
 						]
 					}
 				],
+				"userProperties": [],
 				"typeProperties": {
 					"expression": {
 						"value": "@equals(variables('FeedType'), 'Daily')",
@@ -33,6 +36,7 @@
 						{
 							"name": "Copy Data Daily",
 							"type": "Copy",
+							"dependsOn": [],
 							"policy": {
 								"timeout": "7.00:00:00",
 								"retry": 0,
@@ -40,6 +44,7 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
+							"userProperties": [],
 							"typeProperties": {
 								"source": {
 									"type": "BlobSource",
@@ -97,6 +102,7 @@
 						]
 					}
 				],
+				"userProperties": [],
 				"typeProperties": {
 					"expression": {
 						"value": "@equals(variables('FeedType'), 'Monthly')",
@@ -106,6 +112,7 @@
 						{
 							"name": "Copy Data Monthly",
 							"type": "Copy",
+							"dependsOn": [],
 							"policy": {
 								"timeout": "7.00:00:00",
 								"retry": 0,
@@ -113,6 +120,7 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
+							"userProperties": [],
 							"typeProperties": {
 								"source": {
 									"type": "BlobSource",
@@ -177,8 +185,9 @@
 			}
 		},
 		"folder": {
-			"name": "Sample Pipelines"
-		}
+			"name": "Pipelines"
+		},
+		"annotations": []
 	},
 	"type": "Microsoft.DataFactory/factories/pipelines"
 }

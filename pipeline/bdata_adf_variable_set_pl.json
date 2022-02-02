@@ -5,6 +5,7 @@
 			{
 				"name": "Metadata Store 02",
 				"type": "GetMetadata",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -12,6 +13,7 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
+				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
 						"referenceName": "AzureBlob_storesales_store02",
@@ -33,6 +35,7 @@
 						]
 					}
 				],
+				"userProperties": [],
 				"typeProperties": {
 					"items": {
 						"value": "@activity('Metadata Store 02').output.childitems",
@@ -42,6 +45,8 @@
 						{
 							"name": "Build filename list 02",
 							"type": "AppendVariable",
+							"dependsOn": [],
+							"userProperties": [],
 							"typeProperties": {
 								"variableName": "var_file_list",
 								"value": {
@@ -76,6 +81,7 @@
 						]
 					}
 				],
+				"userProperties": [],
 				"typeProperties": {
 					"variableName": "var_file_list_check",
 					"value": {
@@ -87,6 +93,7 @@
 			{
 				"name": "Metadata Store 03",
 				"type": "GetMetadata",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -94,6 +101,7 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
+				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
 						"referenceName": "AzureBlob_storesales_store03",
@@ -115,6 +123,7 @@
 						]
 					}
 				],
+				"userProperties": [],
 				"typeProperties": {
 					"items": {
 						"value": "@activity('Metadata Store 03').output.childitems",
@@ -124,6 +133,8 @@
 						{
 							"name": "Build filename list 03",
 							"type": "AppendVariable",
+							"dependsOn": [],
+							"userProperties": [],
 							"typeProperties": {
 								"variableName": "var_file_list",
 								"value": {
@@ -146,6 +157,7 @@
 						]
 					}
 				],
+				"userProperties": [],
 				"typeProperties": {
 					"items": {
 						"value": "@variables('var_file_list')",
@@ -155,6 +167,7 @@
 						{
 							"name": "Copy Data Blob to SQL",
 							"type": "Copy",
+							"dependsOn": [],
 							"policy": {
 								"timeout": "7.00:00:00",
 								"retry": 0,
@@ -162,6 +175,7 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
+							"userProperties": [],
 							"typeProperties": {
 								"source": {
 									"type": "BlobSource",
@@ -209,6 +223,7 @@
 			{
 				"name": "Metadata Store 01",
 				"type": "GetMetadata",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -216,6 +231,7 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
+				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
 						"referenceName": "AzureBlob_storesales_store01",
@@ -237,6 +253,7 @@
 						]
 					}
 				],
+				"userProperties": [],
 				"typeProperties": {
 					"items": {
 						"value": "@activity('Metadata Store 01').output.childitems",
@@ -246,6 +263,8 @@
 						{
 							"name": "Build filename list 01",
 							"type": "AppendVariable",
+							"dependsOn": [],
+							"userProperties": [],
 							"typeProperties": {
 								"variableName": "var_file_list",
 								"value": {
@@ -267,8 +286,9 @@
 			}
 		},
 		"folder": {
-			"name": "Sample Pipelines"
-		}
+			"name": "Pipelines"
+		},
+		"annotations": []
 	},
 	"type": "Microsoft.DataFactory/factories/pipelines"
 }

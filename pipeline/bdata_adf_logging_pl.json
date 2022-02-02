@@ -13,6 +13,7 @@
 						]
 					}
 				],
+				"userProperties": [],
 				"typeProperties": {
 					"variableName": "var_file_list_check",
 					"value": {
@@ -32,6 +33,7 @@
 						]
 					}
 				],
+				"userProperties": [],
 				"typeProperties": {
 					"items": {
 						"value": "@variables('var_file_list')",
@@ -41,6 +43,7 @@
 						{
 							"name": "Copy Data Blob to SQL",
 							"type": "Copy",
+							"dependsOn": [],
 							"policy": {
 								"timeout": "7.00:00:00",
 								"retry": 0,
@@ -48,6 +51,7 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
+							"userProperties": [],
 							"typeProperties": {
 								"source": {
 									"type": "BlobSource",
@@ -100,6 +104,7 @@
 									]
 								}
 							],
+							"userProperties": [],
 							"typeProperties": {
 								"variableName": "var_logging",
 								"value": {
@@ -114,6 +119,7 @@
 			{
 				"name": "Metadata Store 01",
 				"type": "GetMetadata",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -121,6 +127,7 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
+				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
 						"referenceName": "AzureBlob_storesales_store01",
@@ -142,6 +149,7 @@
 						]
 					}
 				],
+				"userProperties": [],
 				"typeProperties": {
 					"items": {
 						"value": "@activity('Metadata Store 01').output.childitems",
@@ -151,6 +159,8 @@
 						{
 							"name": "Build filename list 01",
 							"type": "AppendVariable",
+							"dependsOn": [],
+							"userProperties": [],
 							"typeProperties": {
 								"variableName": "var_file_list",
 								"value": {
@@ -173,6 +183,7 @@
 						]
 					}
 				],
+				"userProperties": [],
 				"typeProperties": {
 					"variableName": "var_logging",
 					"value": {
@@ -198,6 +209,7 @@
 						]
 					}
 				],
+				"userProperties": [],
 				"typeProperties": {
 					"items": {
 						"value": "@variables('var_logging')",
@@ -207,6 +219,7 @@
 						{
 							"name": "Stored Procedure1",
 							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
 							"policy": {
 								"timeout": "7.00:00:00",
 								"retry": 0,
@@ -214,6 +227,7 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
+							"userProperties": [],
 							"typeProperties": {
 								"storedProcedureName": "[dbo].[sp_adf_pipeline_log_update]",
 								"storedProcedureParameters": {
@@ -341,8 +355,9 @@
 			}
 		},
 		"folder": {
-			"name": "Sample Pipelines"
-		}
+			"name": "Pipelines"
+		},
+		"annotations": []
 	},
 	"type": "Microsoft.DataFactory/factories/pipelines"
 }
