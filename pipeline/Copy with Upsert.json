@@ -46,7 +46,11 @@
 				"inputs": [
 					{
 						"referenceName": "ADLS_Gen2",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"folder": "ncdatalake/SCD1 Source",
+							"filename": "Employee1.csv"
+						}
 					}
 				],
 				"outputs": [
