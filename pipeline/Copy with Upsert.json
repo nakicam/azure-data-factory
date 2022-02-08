@@ -17,6 +17,11 @@
 				"typeProperties": {
 					"source": {
 						"type": "DelimitedTextSource",
+						"additionalColumns": [
+							{
+								"value": ""
+							}
+						],
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
@@ -36,10 +41,108 @@
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "EmpID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "EmpID",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Region",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Region",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Function",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Function",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Level",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Level",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Role",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Role",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "StartDate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "StartDate",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "EndDate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "EndDate",
+									"type": "String",
+									"physicalType": "String"
+								}
+							}
+						],
 						"typeConversion": true,
 						"typeConversionSettings": {
 							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
+							"treatBooleanAsNumber": true
 						}
 					}
 				},
