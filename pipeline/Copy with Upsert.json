@@ -167,7 +167,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"folder": "ncdatalake/SCD1 Source",
-							"filename": "Employee1.csv"
+							"filename": "employee2.csv"
 						}
 					}
 				],
