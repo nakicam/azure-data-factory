@@ -208,12 +208,23 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataset": {
-									"referenceName": "ASQL_DV_HUB_Customer",
-									"type": "DatasetReference"
+									"referenceName": "ADLS_Gen2",
+									"type": "DatasetReference",
+									"parameters": {
+										"folder": "ncdatalake/SCD1 Source",
+										"filename": "*"
+									}
 								},
 								"fieldList": [
 									"exists"
-								]
+								],
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
 							}
 						},
 						{
