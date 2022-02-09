@@ -13,7 +13,7 @@
 					}
 				}
 			],
-			"script": "section Section1;\r\nshared AdventureWorks = let\r\n  AdfDoc = Sql.Database(\"ncsqldbserver.database.windows.net\", \"ncsqldb\", [CreateNavigationProperties = false]),\r\n  InputTable = AdfDoc{[Schema = \"SalesLT\", Item = \"Product\"]}[Data]\r\nin\r\n  InputTable;\r\nshared UserQuery = let\r\n  Source = AdventureWorks\r\nin\r\n  Source;\r\n",
+			"script": "section Section1;\r\nshared AdventureWorks = let\r\n  AdfDoc = Sql.Database(\"ncsqldbserver.database.windows.net\", \"ncsqldb\", [CreateNavigationProperties = false]),\r\n  InputTable = AdfDoc{[Schema = \"dbo\", Item = \"Employee\"]}[Data]\r\nin\r\n  InputTable;\r\nshared UserQuery = let\r\n  Source = AdventureWorks\r\nin\r\n  Source;\r\n",
 			"documentLocale": "en-us"
 		}
 	}
