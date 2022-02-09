@@ -1,0 +1,10 @@
+{
+	"name": "PQ_KEYVAULT",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://nckeyvault.vault.azure.net/"
+		}
+	}
+}
