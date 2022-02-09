@@ -1,0 +1,6 @@
+{
+	"name": "sf-ir",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
