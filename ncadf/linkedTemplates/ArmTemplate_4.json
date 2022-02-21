@@ -7,6 +7,10 @@
 			"metadata": "Data Factory-Name",
 			"defaultValue": "ncadf"
 		},
+		"validation_adls_source_ds_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "@dataset().FileFolder"
+		},
 		"FileSystem_ls_properties_typeProperties_host": {
 			"type": "string",
 			"defaultValue": "C:\\Temp"
@@ -14,12 +18,107 @@
 		"FileSystem_ls_properties_typeProperties_userId": {
 			"type": "string",
 			"defaultValue": "corp\\rayis.imayev"
+		},
+		"AzureBatch_properties_typeProperties_batchUri": {
+			"type": "string",
+			"defaultValue": "https://ncbatchaccount.germanywestcentral.batch.azure.com"
+		},
+		"AzureBatch_properties_typeProperties_poolName": {
+			"type": "string",
+			"defaultValue": "ncbatchpool"
+		},
+		"AzureBatch_properties_typeProperties_accountName": {
+			"type": "string",
+			"defaultValue": "ncbatchaccount"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_json_flatten_data')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage_LS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "json_data_file.json",
+						"container": "dataflows"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"events": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"process": {
+										"type": "string"
+									},
+									"start_time": {
+										"type": "string"
+									},
+									"stop_time": {
+										"type": "string"
+									},
+									"last_update": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/validation_adls_source_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStore_ls",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"FileFolder": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Other Datasets"
+				},
+				"annotations": [],
+				"type": "AzureDataLakeStoreFile",
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"nullValue": "\\N",
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"folderPath": {
+						"value": "[parameters('validation_adls_source_ds_properties_typeProperties_folderPath')]",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/FileSystem_ls')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -43,34 +142,21 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/blobtestdataset')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
+			"name": "[concat(parameters('factoryName'), '/AzureBatch')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureBlobStorage_LS",
-					"type": "LinkedServiceReference"
-				},
 				"annotations": [],
-				"type": "DelimitedText",
+				"type": "AzureBatch",
 				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "data_e1d3ba64-b436-4999-ba75-1d43de2facc8_26fada78-a396-47c9-b051-c0577253fe35.csv",
-						"folderPath": "csv",
-						"container": "ncsqldb"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "Customer Key|WWI Customer ID|Customer|Bill To Customer|Category|Buying Group|Primary Contact|Postal Code|Valid From|Valid To|Lineage Key",
-						"type": "String"
+					"batchUri": "[parameters('AzureBatch_properties_typeProperties_batchUri')]",
+					"poolName": "[parameters('AzureBatch_properties_typeProperties_poolName')]",
+					"accountName": "[parameters('AzureBatch_properties_typeProperties_accountName')]",
+					"linkedServiceName": {
+						"referenceName": "ADLS",
+						"type": "LinkedServiceReference"
 					}
-				]
+				}
 			},
 			"dependsOn": []
 		},
@@ -1707,7 +1793,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/validation_adls_source_ds')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Workflow_IF_activity_pl')]",
@@ -4079,6 +4167,52 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Start-SSIS-IR')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Start-SSIS-IR",
+						"type": "Custom",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"command": ".\\Test.ps1",
+							"resourceLinkedService": {
+								"referenceName": "ADLS",
+								"type": "LinkedServiceReference"
+							},
+							"folderPath": "ncsqldb/PowerShell-Skripte",
+							"referenceObjects": {
+								"linkedServices": [],
+								"datasets": []
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureBatch",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBatch')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pl_SQL_SP_optional_parameter')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -4124,333 +4258,6 @@
 				},
 				"folder": {
 					"name": "SQL"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_constant_dynamic_JSON')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get List of Files",
-						"type": "GetMetadata",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataset": {
-								"referenceName": "ds_adls_generic_folder",
-								"type": "DatasetReference",
-								"parameters": {
-									"file_folder": "files/system/logs"
-								}
-							},
-							"fieldList": [
-								"childItems"
-							],
-							"storeSettings": {
-								"type": "AzureBlobFSReadSettings",
-								"recursive": true,
-								"enablePartitionDiscovery": false
-							},
-							"formatSettings": {
-								"type": "DelimitedTextReadSettings"
-							}
-						}
-					},
-					{
-						"name": "Collect Initial File List",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Get List of Files",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "var_file_list_initial",
-							"value": {
-								"value": "@activity('Get List of Files').output.childItems",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Merge File List with Constant Values",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Collect Initial File List",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "var_file_list_merged",
-							"value": {
-								"value": "@json(\n  replace(\n    concat('[',\n      replace(\n        replace(\n          join(\n            variables('var_file_list_initial'),\n            concat('*', \n              variables('var_constant_json'),'}')\n               )\n        , '}*', ', ')\n      , '}{', '},{')\n    , ']')\n  , '}]', concat(',', variables('var_constant_json'),'}') \n  )\n)",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"variables": {
-					"var_file_list_initial": {
-						"type": "Array"
-					},
-					"var_file_list_merged": {
-						"type": "Array"
-					},
-					"var_constant_json": {
-						"type": "String",
-						"defaultValue": "\"filetype\":\"log\", \"path\":\"files/system/logs\""
-					}
-				},
-				"folder": {
-					"name": "JSON data"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_constant_dynamic_JSON_SQL')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Lookup1",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "declare @JSON nvarchar(max) = '@{pipeline().parameters.Input}';\n\nselect\n\t(\n\tselect\n\t\tjson_value(@JSON, 'strict $.name') as name,\n\t\t(\n\t\t\tselect\n\t\t\t\tname,\n\t\t\t\ttype,\n\t\t\t\t'log' as filetype,\n\t\t\t\t'files/system/logs' as path\n\t\t\tfrom\n\t\t\t\topenjson(@JSON, 'strict $.value')\n\t\t\t\t\twith (\n\t\t\t\t\t\tname nvarchar(max) 'strict $.name',\n\t\t\t\t\t\ttype nvarchar(max) 'strict $.type'\n\t\t\t\t\t)\n\t\t\tfor\n\t\t\t\tjson path\n\t\t) as value\n\tfor\n\t\tjson path,\n\t\twithout_array_wrapper\n\t) as Object\n;",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "ds_azsql_generic",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "Append variable1",
-						"type": "AppendVariable",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "Output",
-							"value": {
-								"value": "@json(activity('Lookup1').output.firstRow.Object)",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"parameters": {
-					"Input": {
-						"type": "object",
-						"defaultValue": {
-							"name": "var_file_list_initial",
-							"value": [
-								{
-									"name": "01-Monday.log",
-									"type": "File"
-								},
-								{
-									"name": "01-Tuesday.log",
-									"type": "File"
-								},
-								{
-									"name": "01-Wednesday.log",
-									"type": "File"
-								},
-								{
-									"name": "01-Thursday.log",
-									"type": "File"
-								},
-								{
-									"name": "01-Friday.log",
-									"type": "File"
-								}
-							]
-						}
-					}
-				},
-				"variables": {
-					"Output": {
-						"type": "Array",
-						"defaultValue": []
-					}
-				},
-				"folder": {
-					"name": "JSON data"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_data_json_flatten')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get JSON data",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "JsonSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true
-								}
-							},
-							"dataset": {
-								"referenceName": "ls_json_flatten_data",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "For Each Events",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get JSON data",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get JSON data').output.firstRow.events",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Log Event",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[sp_adf_pipeline_log_event]",
-										"storedProcedureParameters": {
-											"process": {
-												"value": {
-													"value": "@item().process",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"start_time": {
-												"value": {
-													"value": "@item().start_time",
-													"type": "Expression"
-												},
-												"type": "DateTime"
-											},
-											"stop_time": {
-												"value": {
-													"value": "@item().stop_time",
-													"type": "Expression"
-												},
-												"type": "DateTime"
-											},
-											"last_update": {
-												"value": {
-													"value": "@item().last_update",
-													"type": "Expression"
-												},
-												"type": "Datetime"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "AzureSqlDatabase_LS",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"variables": {
-					"event": {
-						"type": "Array"
-					}
-				},
-				"folder": {
-					"name": "JSON data"
 				},
 				"annotations": []
 			},

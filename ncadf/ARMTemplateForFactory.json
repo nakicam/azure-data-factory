@@ -43,6 +43,10 @@
 			"type": "secureString",
 			"metadata": "Sichere Zeichenfolge für \"functionKey\" von \"ls_af_gettime\""
 		},
+		"ADLS_connectionString": {
+			"type": "secureString",
+			"metadata": "Sichere Zeichenfolge für \"connectionString\" von \"ADLS\""
+		},
 		"AzureBlobStorageSourceFileStore_properties_typeProperties_fileName": {
 			"type": "string",
 			"defaultValue": "@dataset().filename"
@@ -214,6 +218,18 @@
 		"ls_af_gettime_properties_typeProperties_functionAppUrl": {
 			"type": "string",
 			"defaultValue": "https://bd-eus2-fapp.azurewebsites.net"
+		},
+		"AzureBatch_properties_typeProperties_batchUri": {
+			"type": "string",
+			"defaultValue": "https://ncbatchaccount.germanywestcentral.batch.azure.com"
+		},
+		"AzureBatch_properties_typeProperties_poolName": {
+			"type": "string",
+			"defaultValue": "ncbatchpool"
+		},
+		"AzureBatch_properties_typeProperties_accountName": {
+			"type": "string",
+			"defaultValue": "ncbatchaccount"
 		}
 	},
 	"variables": {
@@ -4789,14 +4805,14 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"name": "[concat(parameters('factoryName'), '/Start-SSIS-IR')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "dataflow1",
-						"type": "ExecuteDataFlow",
+						"name": "Start-SSIS-IR",
+						"type": "Custom",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "7.00:00:00",
@@ -4807,21 +4823,20 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"dataflow": {
-								"referenceName": "dataflow1",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"source1": {},
-									"sink1": {}
-								}
+							"command": ".\\Test.ps1",
+							"resourceLinkedService": {
+								"referenceName": "ADLS",
+								"type": "LinkedServiceReference"
 							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
+							"folderPath": "ncsqldb/PowerShell-Skripte",
+							"referenceObjects": {
+								"linkedServices": [],
+								"datasets": []
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureBatch",
+							"type": "LinkedServiceReference"
 						}
 					}
 				],
@@ -4832,7 +4847,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/dataflow1')]"
+				"[concat(variables('factoryId'), '/linkedServices/ADLS')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureBatch')]"
 			]
 		},
 		{
@@ -9871,6 +9887,40 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/blobtestdataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage_LS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "data_e1d3ba64-b436-4999-ba75-1d43de2facc8_26fada78-a396-47c9-b051-c0577253fe35.csv",
+						"folderPath": "csv",
+						"container": "ncsqldb"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Customer Key|WWI Customer ID|Customer|Bill To Customer|Category|Buying Group|Primary Contact|Postal Code|Valid From|Valid To|Lineage Key",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage_LS')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_adls_adf_dataflows')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -11224,37 +11274,37 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/blobtestdataset')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
+			"name": "[concat(parameters('factoryName'), '/ADLS')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureBlobStorage_LS",
-					"type": "LinkedServiceReference"
-				},
 				"annotations": [],
-				"type": "DelimitedText",
+				"type": "AzureBlobStorage",
 				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "data_e1d3ba64-b436-4999-ba75-1d43de2facc8_26fada78-a396-47c9-b051-c0577253fe35.csv",
-						"folderPath": "csv",
-						"container": "ncsqldb"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "Customer Key|WWI Customer ID|Customer|Bill To Customer|Category|Buying Group|Primary Contact|Postal Code|Valid From|Valid To|Lineage Key",
-						"type": "String"
+					"connectionString": "[parameters('ADLS_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBatch')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBatch",
+				"typeProperties": {
+					"batchUri": "[parameters('AzureBatch_properties_typeProperties_batchUri')]",
+					"poolName": "[parameters('AzureBatch_properties_typeProperties_poolName')]",
+					"accountName": "[parameters('AzureBatch_properties_typeProperties_accountName')]",
+					"linkedServiceName": {
+						"referenceName": "ADLS",
+						"type": "LinkedServiceReference"
 					}
-				]
+				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage_LS')]"
+				"[concat(variables('factoryId'), '/linkedServices/ADLS')]"
 			]
 		}
 	]

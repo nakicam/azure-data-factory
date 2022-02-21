@@ -32,6 +32,9 @@
 		"ls_af_gettime_functionKey": {
 			"value": ""
 		},
+		"ADLS_connectionString": {
+			"value": ""
+		},
 		"AzureBlobStorageSourceFileStore_properties_typeProperties_fileName": {
 			"value": "@dataset().filename"
 		},
@@ -160,6 +163,15 @@
 		},
 		"ls_af_gettime_properties_typeProperties_functionAppUrl": {
 			"value": "https://bd-eus2-fapp.azurewebsites.net"
+		},
+		"AzureBatch_properties_typeProperties_batchUri": {
+			"value": "https://ncbatchaccount.germanywestcentral.batch.azure.com"
+		},
+		"AzureBatch_properties_typeProperties_poolName": {
+			"value": "ncbatchpool"
+		},
+		"AzureBatch_properties_typeProperties_accountName": {
+			"value": "ncbatchaccount"
 		}
 	}
 }

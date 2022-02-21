@@ -13,6 +13,91 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/pl_default_value_array')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Each Parameter Meal",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.par_meal_array",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "pl_meal_array_child",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "pl_default_value_array_child",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"par_meal_array": {
+												"value": "@item().meal_items",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"par_meal_array": {
+						"type": "array",
+						"defaultValue": [
+							{
+								"meal_type": "Breakfast",
+								"meal_time": "07:00:00",
+								"meal_items": [
+									"Egg",
+									"Greek Yogurt",
+									"Coffee"
+								]
+							},
+							{
+								"meal_type": "Lunch",
+								"meal_time": "12:00:00",
+								"meal_items": [
+									"Greek Salad",
+									"Salmon Bagels",
+									"Tea"
+								]
+							},
+							{
+								"meal_type": "Dinner",
+								"meal_time": "18:00:00",
+								"meal_items": [
+									"Kale Salad",
+									"Lentil Soup",
+									"Water"
+								]
+							}
+						]
+					}
+				},
+				"folder": {
+					"name": "Working with Arrays"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pl_durable_function_loop_polling')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1352,36 +1437,6 @@
 				],
 				"typeProperties": {
 					"tableName": "[[dbo].[SAT_Product]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ASQL_DV_SAT_Product_Latest')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase_DV_LS",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "DataVaultTesting"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "HUB_Product_HK",
-						"type": "varchar"
-					},
-					{
-						"name": "SAT_Product_HDIFF",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"tableName": "[[dbo].[vw_latest_sat_product]"
 				}
 			},
 			"dependsOn": []

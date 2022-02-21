@@ -78,20 +78,42 @@
 		"AzureDataLakeStoreSinkFileStore_properties_typeProperties_folderPath": {
 			"type": "string",
 			"defaultValue": "@dataset().folder"
-		},
-		"Template_wasb_delete_properties_typeProperties_fileName": {
-			"type": "string",
-			"defaultValue": "*"
-		},
-		"Template_wasb_delete_properties_typeProperties_folderPath": {
-			"type": "string",
-			"defaultValue": "@dataset().folder"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ASQL_DV_SAT_Product_Latest')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase_DV_LS",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "DataVaultTesting"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "HUB_Product_HK",
+						"type": "varchar"
+					},
+					{
+						"name": "SAT_Product_HDIFF",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"tableName": "[[dbo].[vw_latest_sat_product]"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AdventureWorks')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
@@ -1119,36 +1141,6 @@
 					"quoteChar": "\""
 				},
 				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Template_wasb_delete')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Connection to your source data store.",
-				"linkedServiceName": {
-					"referenceName": "AzureBlobStorage_LS",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"folder": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "Template Datasets"
-				},
-				"annotations": [],
-				"type": "AzureBlob",
-				"typeProperties": {
-					"fileName": "[parameters('Template_wasb_delete_properties_typeProperties_fileName')]",
-					"folderPath": {
-						"value": "[parameters('Template_wasb_delete_properties_typeProperties_folderPath')]",
-						"type": "Expression"
-					}
-				}
 			},
 			"dependsOn": []
 		}
