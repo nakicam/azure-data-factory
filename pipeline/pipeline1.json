@@ -3,8 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "dataflow1",
-				"type": "ExecuteDataFlow",
+				"name": "Start-SSIS-IR",
+				"type": "Custom",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
@@ -15,14 +15,20 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "dataflow1",
-						"type": "DataFlowReference"
+					"command": ".\\Test.ps1",
+					"resourceLinkedService": {
+						"referenceName": "ADLS",
+						"type": "LinkedServiceReference"
 					},
-					"compute": {
-						"coreCount": 8,
-						"computeType": "General"
+					"folderPath": "ncsqldb/PowerShell-Skripte",
+					"referenceObjects": {
+						"linkedServices": [],
+						"datasets": []
 					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureBatch",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
