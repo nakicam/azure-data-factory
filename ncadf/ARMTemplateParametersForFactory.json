@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "ncadf"
 		},
+		"ADLS_connectionString": {
+			"value": ""
+		},
 		"AdventureWorks_connectionString": {
 			"value": ""
 		},
@@ -30,9 +33,6 @@
 			"value": ""
 		},
 		"ls_af_gettime_functionKey": {
-			"value": ""
-		},
-		"ADLS_connectionString": {
 			"value": ""
 		},
 		"AzureBlobStorageSourceFileStore_properties_typeProperties_fileName": {
@@ -128,6 +128,15 @@
 		"validation_adls_source_ds_properties_typeProperties_folderPath": {
 			"value": "@dataset().FileFolder"
 		},
+		"AzureBatch_properties_typeProperties_batchUri": {
+			"value": "https://ncbatchaccount.germanywestcentral.batch.azure.com"
+		},
+		"AzureBatch_properties_typeProperties_poolName": {
+			"value": "ncbatchpool"
+		},
+		"AzureBatch_properties_typeProperties_accountName": {
+			"value": "ncbatchaccount"
+		},
 		"AzureDataLakeStorage_Gen2_properties_typeProperties_url": {
 			"value": "https://ncdatalake.dfs.core.windows.net"
 		},
@@ -163,15 +172,6 @@
 		},
 		"ls_af_gettime_properties_typeProperties_functionAppUrl": {
 			"value": "https://bd-eus2-fapp.azurewebsites.net"
-		},
-		"AzureBatch_properties_typeProperties_batchUri": {
-			"value": "https://ncbatchaccount.germanywestcentral.batch.azure.com"
-		},
-		"AzureBatch_properties_typeProperties_poolName": {
-			"value": "ncbatchpool"
-		},
-		"AzureBatch_properties_typeProperties_accountName": {
-			"value": "ncbatchaccount"
 		}
 	}
 }

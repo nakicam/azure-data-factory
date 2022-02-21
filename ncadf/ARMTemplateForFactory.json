@@ -7,6 +7,10 @@
 			"metadata": "Data Factory-Name",
 			"defaultValue": "ncadf"
 		},
+		"ADLS_connectionString": {
+			"type": "secureString",
+			"metadata": "Sichere Zeichenfolge für \"connectionString\" von \"ADLS\""
+		},
 		"AdventureWorks_connectionString": {
 			"type": "secureString",
 			"metadata": "Sichere Zeichenfolge für \"connectionString\" von \"AdventureWorks\""
@@ -42,10 +46,6 @@
 		"ls_af_gettime_functionKey": {
 			"type": "secureString",
 			"metadata": "Sichere Zeichenfolge für \"functionKey\" von \"ls_af_gettime\""
-		},
-		"ADLS_connectionString": {
-			"type": "secureString",
-			"metadata": "Sichere Zeichenfolge für \"connectionString\" von \"ADLS\""
 		},
 		"AzureBlobStorageSourceFileStore_properties_typeProperties_fileName": {
 			"type": "string",
@@ -171,6 +171,18 @@
 			"type": "string",
 			"defaultValue": "@dataset().FileFolder"
 		},
+		"AzureBatch_properties_typeProperties_batchUri": {
+			"type": "string",
+			"defaultValue": "https://ncbatchaccount.germanywestcentral.batch.azure.com"
+		},
+		"AzureBatch_properties_typeProperties_poolName": {
+			"type": "string",
+			"defaultValue": "ncbatchpool"
+		},
+		"AzureBatch_properties_typeProperties_accountName": {
+			"type": "string",
+			"defaultValue": "ncbatchaccount"
+		},
 		"AzureDataLakeStorage_Gen2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://ncdatalake.dfs.core.windows.net"
@@ -218,18 +230,6 @@
 		"ls_af_gettime_properties_typeProperties_functionAppUrl": {
 			"type": "string",
 			"defaultValue": "https://bd-eus2-fapp.azurewebsites.net"
-		},
-		"AzureBatch_properties_typeProperties_batchUri": {
-			"type": "string",
-			"defaultValue": "https://ncbatchaccount.germanywestcentral.batch.azure.com"
-		},
-		"AzureBatch_properties_typeProperties_poolName": {
-			"type": "string",
-			"defaultValue": "ncbatchpool"
-		},
-		"AzureBatch_properties_typeProperties_accountName": {
-			"type": "string",
-			"defaultValue": "ncbatchaccount"
 		}
 	},
 	"variables": {
@@ -1787,6 +1787,49 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/Template_wasb_delete_time')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Start-SSIS-IR')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Start-SSIS-IR",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "https://management.azure.com/subscriptions/46aa579a-3ecc-4f85-a662-155a9c477508/resourceGroups/Data_Engineering/providers/Microsoft.DataFactory/factories/ncadf/integrationRuntimes/ssis-lift/start?api-version=2018-06-01",
+								"type": "Expression"
+							},
+							"method": "POST",
+							"headers": {},
+							"body": {
+								"message": "Start my IR"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://management.azure.com/"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ValidationActivity_CopyDeleteFiles')]",
@@ -4802,53 +4845,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/df_flatten_task_cakes_JSON')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Start-SSIS-IR')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Start-SSIS-IR",
-						"type": "Custom",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"command": ".\\Test.ps1",
-							"resourceLinkedService": {
-								"referenceName": "ADLS",
-								"type": "LinkedServiceReference"
-							},
-							"folderPath": "ncsqldb/PowerShell-Skripte",
-							"referenceObjects": {
-								"linkedServices": [],
-								"datasets": []
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureBatch",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ADLS')]",
-				"[concat(variables('factoryId'), '/linkedServices/AzureBatch')]"
 			]
 		},
 		{
@@ -10406,6 +10402,19 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ADLS')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('ADLS_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AdventureWorks')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -10417,6 +10426,27 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBatch')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBatch",
+				"typeProperties": {
+					"batchUri": "[parameters('AzureBatch_properties_typeProperties_batchUri')]",
+					"poolName": "[parameters('AzureBatch_properties_typeProperties_poolName')]",
+					"accountName": "[parameters('AzureBatch_properties_typeProperties_accountName')]",
+					"linkedServiceName": {
+						"referenceName": "ADLS",
+						"type": "LinkedServiceReference"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ADLS')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage_LS')]",
@@ -11271,40 +11301,6 @@
 				"[concat(variables('factoryId'), '/datasets/ds_df_temperature_data')]",
 				"[concat(variables('factoryId'), '/datasets/ds_df_temperature_header')]",
 				"[concat(variables('factoryId'), '/datasets/ds_df_temperature_output')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ADLS')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('ADLS_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureBatch')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBatch",
-				"typeProperties": {
-					"batchUri": "[parameters('AzureBatch_properties_typeProperties_batchUri')]",
-					"poolName": "[parameters('AzureBatch_properties_typeProperties_poolName')]",
-					"accountName": "[parameters('AzureBatch_properties_typeProperties_accountName')]",
-					"linkedServiceName": {
-						"referenceName": "ADLS",
-						"type": "LinkedServiceReference"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ADLS')]"
 			]
 		}
 	]

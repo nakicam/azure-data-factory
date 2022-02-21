@@ -11,14 +11,6 @@
 			"type": "string",
 			"defaultValue": "@dataset().FileFolder"
 		},
-		"FileSystem_ls_properties_typeProperties_host": {
-			"type": "string",
-			"defaultValue": "C:\\Temp"
-		},
-		"FileSystem_ls_properties_typeProperties_userId": {
-			"type": "string",
-			"defaultValue": "corp\\rayis.imayev"
-		},
 		"AzureBatch_properties_typeProperties_batchUri": {
 			"type": "string",
 			"defaultValue": "https://ncbatchaccount.germanywestcentral.batch.azure.com"
@@ -30,12 +22,59 @@
 		"AzureBatch_properties_typeProperties_accountName": {
 			"type": "string",
 			"defaultValue": "ncbatchaccount"
+		},
+		"FileSystem_ls_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "C:\\Temp"
+		},
+		"FileSystem_ls_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "corp\\rayis.imayev"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_json_temp')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Gen2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Test_JSON.txt",
+						"fileSystem": "jsondata"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "EmpId",
+						"type": "String"
+					},
+					{
+						"name": "EmpName",
+						"type": "String"
+					},
+					{
+						"name": "Detail",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ls_json_flatten_data')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
@@ -120,6 +159,25 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureBatch')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBatch",
+				"typeProperties": {
+					"batchUri": "[parameters('AzureBatch_properties_typeProperties_batchUri')]",
+					"poolName": "[parameters('AzureBatch_properties_typeProperties_poolName')]",
+					"accountName": "[parameters('AzureBatch_properties_typeProperties_accountName')]",
+					"linkedServiceName": {
+						"referenceName": "ADLS",
+						"type": "LinkedServiceReference"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/FileSystem_ls')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -136,25 +194,6 @@
 							"type": "LinkedServiceReference"
 						},
 						"secretName": "local-machine-account-password"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureBatch')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBatch",
-				"typeProperties": {
-					"batchUri": "[parameters('AzureBatch_properties_typeProperties_batchUri')]",
-					"poolName": "[parameters('AzureBatch_properties_typeProperties_poolName')]",
-					"accountName": "[parameters('AzureBatch_properties_typeProperties_accountName')]",
-					"linkedServiceName": {
-						"referenceName": "ADLS",
-						"type": "LinkedServiceReference"
 					}
 				}
 			},
@@ -4165,52 +4204,6 @@
 				"annotations": []
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Start-SSIS-IR')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Start-SSIS-IR",
-						"type": "Custom",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"command": ".\\Test.ps1",
-							"resourceLinkedService": {
-								"referenceName": "ADLS",
-								"type": "LinkedServiceReference"
-							},
-							"folderPath": "ncsqldb/PowerShell-Skripte",
-							"referenceObjects": {
-								"linkedServices": [],
-								"datasets": []
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureBatch",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureBatch')]"
-			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_SQL_SP_optional_parameter')]",

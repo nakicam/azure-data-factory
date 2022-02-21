@@ -7,6 +7,10 @@
 			"metadata": "Data Factory-Name",
 			"defaultValue": "ncadf"
 		},
+		"ADLS_connectionString": {
+			"type": "secureString",
+			"metadata": "Sichere Zeichenfolge für \"connectionString\" von \"ADLS\""
+		},
 		"AdventureWorks_connectionString": {
 			"type": "secureString",
 			"metadata": "Sichere Zeichenfolge für \"connectionString\" von \"AdventureWorks\""
@@ -42,10 +46,6 @@
 		"ls_af_gettime_functionKey": {
 			"type": "secureString",
 			"metadata": "Sichere Zeichenfolge für \"functionKey\" von \"ls_af_gettime\""
-		},
-		"ADLS_connectionString": {
-			"type": "secureString",
-			"metadata": "Sichere Zeichenfolge für \"connectionString\" von \"ADLS\""
 		},
 		"AzureBlobStorageSourceFileStore_properties_typeProperties_fileName": {
 			"type": "string",
@@ -171,6 +171,18 @@
 			"type": "string",
 			"defaultValue": "@dataset().FileFolder"
 		},
+		"AzureBatch_properties_typeProperties_batchUri": {
+			"type": "string",
+			"defaultValue": "https://ncbatchaccount.germanywestcentral.batch.azure.com"
+		},
+		"AzureBatch_properties_typeProperties_poolName": {
+			"type": "string",
+			"defaultValue": "ncbatchpool"
+		},
+		"AzureBatch_properties_typeProperties_accountName": {
+			"type": "string",
+			"defaultValue": "ncbatchaccount"
+		},
 		"AzureDataLakeStorage_Gen2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://ncdatalake.dfs.core.windows.net"
@@ -219,18 +231,6 @@
 			"type": "string",
 			"defaultValue": "https://bd-eus2-fapp.azurewebsites.net"
 		},
-		"AzureBatch_properties_typeProperties_batchUri": {
-			"type": "string",
-			"defaultValue": "https://ncbatchaccount.germanywestcentral.batch.azure.com"
-		},
-		"AzureBatch_properties_typeProperties_poolName": {
-			"type": "string",
-			"defaultValue": "ncbatchpool"
-		},
-		"AzureBatch_properties_typeProperties_accountName": {
-			"type": "string",
-			"defaultValue": "ncbatchaccount"
-		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI für Speicherkonto mit verknüpften ARM-Vorlagen"
@@ -258,6 +258,9 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"ADLS_connectionString": {
+						"value": "[parameters('ADLS_connectionString')]"
+					},
 					"AdventureWorks_connectionString": {
 						"value": "[parameters('AdventureWorks_connectionString')]"
 					},
@@ -284,9 +287,6 @@
 					},
 					"ls_af_gettime_functionKey": {
 						"value": "[parameters('ls_af_gettime_functionKey')]"
-					},
-					"ADLS_connectionString": {
-						"value": "[parameters('ADLS_connectionString')]"
 					},
 					"AzureDataLakeStorage_Gen2_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorage_Gen2_properties_typeProperties_url')]"
@@ -483,12 +483,6 @@
 					"validation_adls_source_ds_properties_typeProperties_folderPath": {
 						"value": "[parameters('validation_adls_source_ds_properties_typeProperties_folderPath')]"
 					},
-					"FileSystem_ls_properties_typeProperties_host": {
-						"value": "[parameters('FileSystem_ls_properties_typeProperties_host')]"
-					},
-					"FileSystem_ls_properties_typeProperties_userId": {
-						"value": "[parameters('FileSystem_ls_properties_typeProperties_userId')]"
-					},
 					"AzureBatch_properties_typeProperties_batchUri": {
 						"value": "[parameters('AzureBatch_properties_typeProperties_batchUri')]"
 					},
@@ -497,6 +491,12 @@
 					},
 					"AzureBatch_properties_typeProperties_accountName": {
 						"value": "[parameters('AzureBatch_properties_typeProperties_accountName')]"
+					},
+					"FileSystem_ls_properties_typeProperties_host": {
+						"value": "[parameters('FileSystem_ls_properties_typeProperties_host')]"
+					},
+					"FileSystem_ls_properties_typeProperties_userId": {
+						"value": "[parameters('FileSystem_ls_properties_typeProperties_userId')]"
 					}
 				}
 			},
