@@ -4,7 +4,7 @@
 		"annotations": [],
 		"type": "AzureKeyVault",
 		"typeProperties": {
-			"baseUrl": "https://azu-eus2-edu-kvt.vault.azure.net/"
+			"baseUrl": "https://nckeyvault.vault.azure.net/"
 		}
 	}
 }

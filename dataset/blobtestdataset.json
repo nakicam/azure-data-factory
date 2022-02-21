@@ -1,0 +1,29 @@
+{
+	"name": "blobtestdataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_LS",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "data_e1d3ba64-b436-4999-ba75-1d43de2facc8_26fada78-a396-47c9-b051-c0577253fe35.csv",
+				"folderPath": "csv",
+				"container": "ncsqldb"
+			},
+			"columnDelimiter": "|",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Customer Key|WWI Customer ID|Customer|Bill To Customer|Category|Buying Group|Primary Contact|Postal Code|Valid From|Valid To|Lineage Key",
+				"type": "String"
+			}
+		]
+	}
+}
