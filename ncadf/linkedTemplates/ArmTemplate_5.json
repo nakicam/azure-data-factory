@@ -21,6 +21,57 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/pl_SQL_SP_optional_parameter')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Exec Azure SQL SP",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[dbo].[sp_get_week_days]",
+								"storedProcedureParameters": {
+									"week_number": {
+										"type": "Int32",
+										"value": "1"
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_azsql_generic",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "SQL"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pl_constant_dynamic_JSON')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -2125,57 +2176,6 @@
 						}
 					],
 					"script": "source(output(\n\t\tbatters as (batter as (id as string, type as string)[]),\n\t\tid as string,\n\t\tname as string,\n\t\tppu as string,\n\t\ttopping as (id as string, type as string)[],\n\t\ttype as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: true,\n\tlimit: 100,\n\tignoreNoFilesFound: false,\n\tdocumentForm: 'arrayOfDocuments',\n\twildcardPaths:['ManyJSON_Objects.json']) ~> SourceJSONCakes\nSourceJSONCakes foldDown(unroll(topping),\n\tmapColumn(\n\t\tid,\n\t\tcake_type = type,\n\t\tcake_name = name,\n\t\tppu,\n\t\ttopping_id = topping.id,\n\t\ttopping_type = topping.type,\n\t\tbatters\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> FlattenTopping\nFlattenTopping foldDown(unroll(batters.batter, batters.batter),\n\tmapColumn(\n\t\tid,\n\t\tcake_type,\n\t\tcake_name,\n\t\tppu,\n\t\ttopping_id,\n\t\ttopping_type,\n\t\tbatter_id = batters.batter.id,\n\t\tbatter_type = batters.batter.type\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> FlattenBatter\nFlattenBatter sink(allowSchemaDrift: false,\n\tvalidateSchema: false,\n\tinput(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string\n\t),\n\tpartitionFileNames:['flatten_output.csv'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> SinkFlattenOutput"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/df_stacking_datasets')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "ds_df_temperature_data",
-								"type": "DatasetReference"
-							},
-							"name": "SourceTemperature"
-						},
-						{
-							"dataset": {
-								"referenceName": "ds_df_temperature_header",
-								"type": "DatasetReference"
-							},
-							"name": "SourceHeader"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "ds_df_temperature_output",
-								"type": "DatasetReference"
-							},
-							"name": "SingOutputDataset"
-						}
-					],
-					"transformations": [
-						{
-							"name": "FilterCanadaData"
-						},
-						{
-							"name": "CombineDatasets"
-						},
-						{
-							"name": "DataSortColumn"
-						},
-						{
-							"name": "SortOutput"
-						}
-					],
-					"script": "source(output(\n\t\tdt as string,\n\t\tAverageTemperature as string,\n\t\tAverageTemperatureUncertainty as string,\n\t\tCity as string,\n\t\tCountry as string,\n\t\tLatitude as string,\n\t\tLongitude as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> SourceTemperature\nsource(output(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string,\n\t\tColumn_5 as string,\n\t\tColumn_6 as string,\n\t\tColumn_7 as string,\n\t\tColumn_8 as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> SourceHeader\nSourceTemperature filter(Country == 'Canada') ~> FilterCanadaData\nSourceHeader, DataSortColumn union(byName: false)~> CombineDatasets\nFilterCanadaData derive(row_id = 2) ~> DataSortColumn\nCombineDatasets sort(asc(Column_8, true)) ~> SortOutput\nSortOutput sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string\n\t),\n\tpartitionFileNames:['GlobalLandTemperaturesByMajorCity-Canada.csv'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tmapColumn(\n\t\tColumn_1,\n\t\tColumn_2,\n\t\tColumn_3,\n\t\tColumn_4,\n\t\tColumn_5,\n\t\tColumn_6,\n\t\tColumn_7\n\t),\n\tpartitionBy('hash', 1)) ~> SingOutputDataset"
 				}
 			},
 			"dependsOn": []

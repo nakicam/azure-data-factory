@@ -11302,6 +11302,49 @@
 				"[concat(variables('factoryId'), '/datasets/ds_df_temperature_header')]",
 				"[concat(variables('factoryId'), '/datasets/ds_df_temperature_output')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Stop-SSIS-IR')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Stop-SSIS-IR",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "https://management.azure.com/subscriptions/46aa579a-3ecc-4f85-a662-155a9c477508/resourceGroups/Data_Engineering/providers/Microsoft.DataFactory/factories/ncadf/integrationRuntimes/ssis-lift/stop?api-version=2018-06-01",
+								"type": "Expression"
+							},
+							"method": "POST",
+							"headers": {},
+							"body": {
+								"message": "Start my IR"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://management.azure.com/"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
 		}
 	]
 }
