@@ -15,7 +15,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"command": ".\\Test.ps1",
+					"command": "cmd .\\Test.ps1",
 					"resourceLinkedService": {
 						"referenceName": "ADLS",
 						"type": "LinkedServiceReference"
