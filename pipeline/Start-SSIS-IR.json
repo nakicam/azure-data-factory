@@ -22,6 +22,10 @@
 					"method": "POST",
 					"body": {
 						"message": "Start my IR"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "ncadf"
 					}
 				}
 			}
