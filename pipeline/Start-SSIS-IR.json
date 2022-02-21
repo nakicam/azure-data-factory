@@ -4,7 +4,7 @@
 		"activities": [
 			{
 				"name": "Start-SSIS-IR",
-				"type": "Custom",
+				"type": "WebActivity",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
@@ -15,20 +15,14 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"command": "cmd .\\Test.ps1",
-					"resourceLinkedService": {
-						"referenceName": "ADLS",
-						"type": "LinkedServiceReference"
+					"url": {
+						"value": "https://management.azure.com/subscriptions/46aa579a-3ecc-4f85-a662-155a9c477508/resourceGroups/Data_Engineering/providers/Microsoft.DataFactory/factories/ncadf/integrationRuntimes/ssis-lift/start?api-version=2018-06-01",
+						"type": "Expression"
 					},
-					"folderPath": "ncsqldb/PowerShell-Skripte",
-					"referenceObjects": {
-						"linkedServices": [],
-						"datasets": []
+					"method": "POST",
+					"body": {
+						"message": "Start my IR"
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "AzureBatch",
-					"type": "LinkedServiceReference"
 				}
 			}
 		],
