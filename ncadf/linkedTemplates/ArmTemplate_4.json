@@ -43,6 +43,38 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/blobtestdataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage_LS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "data_e1d3ba64-b436-4999-ba75-1d43de2facc8_26fada78-a396-47c9-b051-c0577253fe35.csv",
+						"folderPath": "csv",
+						"container": "ncsqldb"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Customer Key|WWI Customer ID|Customer|Bill To Customer|Category|Buying Group|Primary Contact|Postal Code|Valid From|Valid To|Lineage Key",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/CopyFiles_DeleteFiles_Blob')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -4393,127 +4425,6 @@
 											"last_update": {
 												"value": {
 													"value": "@item().last_update",
-													"type": "Expression"
-												},
-												"type": "Datetime"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "AzureSqlDatabase_LS",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"variables": {
-					"event": {
-						"type": "Array"
-					}
-				},
-				"folder": {
-					"name": "JSON data"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_data_json_flatten_corrected')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get JSON data",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "JsonSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true
-								}
-							},
-							"dataset": {
-								"referenceName": "ls_json_flatten_data",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "For Each Events",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get JSON data",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get JSON data').output.firstRow.events",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Log Event",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[sp_adf_pipeline_log_event]",
-										"storedProcedureParameters": {
-											"process": {
-												"value": {
-													"value": "@item().process",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"start_time": {
-												"value": {
-													"value": "@item().start_time",
-													"type": "Expression"
-												},
-												"type": "DateTime"
-											},
-											"stop_time": {
-												"value": {
-													"value": "@if(contains(string(item()),'\"stop_time\":'),item().stop_time,null)",
-													"type": "Expression"
-												},
-												"type": "DateTime"
-											},
-											"last_update": {
-												"value": {
-													"value": "@if(contains(string(item()),'\"last_update\":'),item().last_update,utcNow())",
 													"type": "Expression"
 												},
 												"type": "Datetime"
