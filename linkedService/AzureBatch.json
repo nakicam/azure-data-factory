@@ -1,0 +1,16 @@
+{
+	"name": "AzureBatch",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBatch",
+		"typeProperties": {
+			"batchUri": "https://ncbatchaccount.germanywestcentral.batch.azure.com",
+			"poolName": "ncbatchpool",
+			"accountName": "ncbatchaccount",
+			"linkedServiceName": {
+				"referenceName": "ADLS",
+				"type": "LinkedServiceReference"
+			}
+		}
+	}
+}
